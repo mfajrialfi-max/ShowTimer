@@ -35,6 +35,28 @@ https://...trycloudflare.com/panitia/main
 
 Saat dibuka dari host publik, ShowTimer mengarahkan halaman operator/stage ke halaman panitia dan hanya menerima pesan dari panitia. Kontrol operator tetap gunakan `localhost` atau alamat LAN.
 
+## Auto-start saat laptop menyala
+
+Di Windows, double-click:
+
+```text
+install-autostart.bat
+```
+
+Ini membuat Windows Task Scheduler bernama `ShowTimer Public Tunnel` yang otomatis menjalankan ShowTimer dan Cloudflare tunnel saat user login. URL publik terbaru disimpan di:
+
+```text
+artifacts\public-panitia-url.txt
+```
+
+Untuk menampilkan link dari terminal:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\show-public-link.ps1
+```
+
+Catatan: Quick Tunnel Cloudflare bisa mengganti URL setiap kali tunnel dibuat ulang. Untuk URL permanen, gunakan Cloudflare Tunnel bernama dengan domain sendiri atau deploy ke host Node.
+
 ## Fitur
 
 - Timer countdown real-time dengan start, pause, reset, tambah/kurangi waktu, dan overtime.
