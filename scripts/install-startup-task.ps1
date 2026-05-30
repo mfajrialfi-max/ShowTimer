@@ -29,10 +29,11 @@ try {
 } catch {
   $StartupDir = [Environment]::GetFolderPath('Startup')
   $StartupFile = Join-Path $StartupDir 'ShowTimer Public Tunnel.vbs'
-  $Command = "$PowerShell $Arguments"
+  $Command = "`"$PowerShell`" $Arguments"
+  $VbsCommand = $Command.Replace('"', '""')
   $Vbs = @"
 Set shell = CreateObject("WScript.Shell")
-shell.Run "$Command", 0, False
+shell.Run "$VbsCommand", 0, False
 "@
 
   Set-Content -Path $StartupFile -Value $Vbs -Encoding ASCII
