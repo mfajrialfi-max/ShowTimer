@@ -1,0 +1,23 @@
+{
+  "name": "showtimer",
+  "version": "1.0.0",
+  "description": "Timer acara dan panggung real-time untuk rundown event, layar stage, operator, dan speaker.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "timer",
+    "event",
+    "rundown",
+    "stage",
+    "speaker"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  }
+}
