@@ -20,7 +20,7 @@ if (['control', 'stage', 'panitia', 'speaker'].includes(pathParts[0])) {
 }
 
 if (role !== 'home') {
-  socket.emit('room:join', { roomId });
+  socket.emit('room:join', { roomId, role });
 }
 
 socket.on('room:state', (nextState) => {

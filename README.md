@@ -19,6 +19,22 @@ Buka:
 
 Untuk perangkat lain di jaringan yang sama, pakai alamat LAN yang muncul di terminal saat server berjalan, misalnya `http://192.168.1.20:3000/stage/main`.
 
+## Link publik sementara untuk panitia
+
+Untuk membuka layar panitia lewat internet tanpa deploy penuh, jalankan ShowTimer lalu buka terminal kedua:
+
+```bash
+cloudflared tunnel --url http://localhost:3000
+```
+
+Cloudflare akan memberi URL `https://...trycloudflare.com`. Bagikan link `/panitia/main`, misalnya:
+
+```text
+https://...trycloudflare.com/panitia/main
+```
+
+Saat dibuka dari host publik, ShowTimer mengarahkan halaman operator/stage ke halaman panitia dan hanya menerima pesan dari panitia. Kontrol operator tetap gunakan `localhost` atau alamat LAN.
+
 ## Fitur
 
 - Timer countdown real-time dengan start, pause, reset, tambah/kurangi waktu, dan overtime.

@@ -57,6 +57,54 @@ function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
+function hostNameFromHeader(hostHeader) {
+  return String(hostHeader || '')
+    .replace(/^\[/, '')
+    .replace(/\]$/, '')
+    .split(':')[0]
+    .toLowerCase();
+}
+
+function isTrustedLocalHost(hostHeader) {
+  const hostname = hostNameFromHeader(hostHeader);
+  return hostname === 'localhost'
+    || hostname === '127.0.0.1'
+    || hostname === '::1'
+    || hostname.startsWith('10.')
+    || hostname.startsWith('192.168.')
+    || /^172\.(1[6-9]|2\d|3[0-1])\./.test(hostname);
+}
+
+function publicRoomFromPath(pathname) {
+  const match = String(pathname || '').match(/^\/(?:control|stage|panitia|speaker)\/([^/?#]+)/i);
+  return match ? match[1] : 'main';
+}
+
+function publicPathAllowed(pathname) {
+  const cleanPath = String(pathname || '').toLowerCase();
+  return cleanPath === '/index.html'
+    || cleanPath === '/app.js'
+    || cleanPath === '/styles.css'
+    || cleanPath === '/favicon.ico'
+    || cleanPath.startsWith('/panitia/')
+    || cleanPath.startsWith('/speaker/')
+    || cleanPath.startsWith('/api/rooms/')
+    || cleanPath === '/api/health';
+}
+
+function normalizeRole(role) {
+  const cleanRole = String(role || '').toLowerCase();
+  if (cleanRole === 'operator') return 'operator';
+  if (cleanRole === 'stage') return 'stage';
+  return 'panitia';
+}
+
+function roleCanApplyAction(role, type) {
+  if (role === 'operator') return true;
+  if (role === 'panitia') return type === 'panitiaMessage:add';
+  return false;
+}
+
 function createRoom(roomId) {
   const firstDuration = DEFAULT_ITEMS[0].durationMs;
   return {
@@ -205,9 +253,11 @@ function setActive(state, index) {
   state.timer.endAt = null;
 }
 
-function applyAction(roomId, action) {
+function applyAction(roomId, action, role = 'operator') {
   const state = getRoom(roomId);
   const type = action && action.type;
+
+  if (!roleCanApplyAction(role, type)) return;
 
   switch (type) {
     case 'meta:update': {
@@ -376,6 +426,24 @@ function localAddresses() {
 loadRooms();
 
 app.use(express.json({ limit: '1mb' }));
+app.use((request, response, next) => {
+  if (isTrustedLocalHost(request.headers.host)) {
+    next();
+    return;
+  }
+
+  if (request.path === '/') {
+    response.redirect(302, '/panitia/main');
+    return;
+  }
+
+  if (publicPathAllowed(request.path)) {
+    next();
+    return;
+  }
+
+  response.redirect(302, `/panitia/${publicRoomFromPath(request.path)}`);
+});
 app.use(express.static(path.join(__dirname, 'public'), {
   etag: false,
   lastModified: false,
@@ -392,26 +460,34 @@ app.get('/api/rooms/:roomId', (request, response) => {
   response.json(hydrateForClient(getRoom(request.params.roomId)));
 });
 
-app.get(['/control/:roomId', '/stage/:roomId', '/panitia/:roomId', '/speaker/:roomId'], (_request, response) => {
+function sendApp(response) {
+  response.setHeader('Cache-Control', 'no-store');
   response.sendFile(path.join(__dirname, 'public', 'index.html'));
+}
+
+app.get(['/control/:roomId', '/stage/:roomId', '/panitia/:roomId', '/speaker/:roomId'], (_request, response) => {
+  sendApp(response);
 });
 
 app.get('*', (_request, response) => {
-  response.sendFile(path.join(__dirname, 'public', 'index.html'));
+  sendApp(response);
 });
 
 io.on('connection', (socket) => {
   let joinedRoom = null;
+  let joinedRole = 'panitia';
+  const publicClient = !isTrustedLocalHost(socket.handshake.headers.host);
 
-  socket.on('room:join', ({ roomId }) => {
+  socket.on('room:join', ({ roomId, role }) => {
     joinedRoom = String(roomId || 'main').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 48) || 'main';
+    joinedRole = publicClient ? 'panitia' : normalizeRole(role);
     socket.join(joinedRoom);
     socket.emit('room:state', hydrateForClient(getRoom(joinedRoom)));
   });
 
   socket.on('room:action', (action) => {
     if (!joinedRoom) return;
-    applyAction(joinedRoom, action);
+    applyAction(joinedRoom, action, joinedRole);
   });
 });
 
