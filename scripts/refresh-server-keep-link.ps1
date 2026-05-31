@@ -8,6 +8,7 @@ $ServerErr = Join-Path $Artifacts 'server.err.log'
 $ServerPid = Join-Path $Artifacts 'server.pid'
 $TunnelPid = Join-Path $Artifacts 'cloudflared.pid'
 $PublicPanitiaUrlFile = Join-Path $Artifacts 'public-panitia-url.txt'
+$PublicStageUrlFile = Join-Path $Artifacts 'public-stage-url.txt'
 
 New-Item -ItemType Directory -Force -Path $Artifacts | Out-Null
 
@@ -86,8 +87,12 @@ $server.Id | Set-Content -NoNewline -Path $ServerPid
 Wait-ShowTimerServer
 
 if (Test-Path $PublicPanitiaUrlFile) {
-  $url = Get-Content -Raw $PublicPanitiaUrlFile
-  Write-Output "Server refreshed. Public URL unchanged: $url"
+  $panitiaUrl = Get-Content -Raw $PublicPanitiaUrlFile
+  Write-Output "Server refreshed. Public Panitia URL unchanged: $panitiaUrl"
+  if (Test-Path $PublicStageUrlFile) {
+    $stageUrl = Get-Content -Raw $PublicStageUrlFile
+    Write-Output "Public Stage URL unchanged: $stageUrl"
+  }
 } else {
   Write-Output 'Server refreshed. Public URL file was not found, but the existing tunnel was not restarted.'
 }

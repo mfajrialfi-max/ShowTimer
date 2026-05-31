@@ -86,6 +86,7 @@ function publicPathAllowed(pathname) {
     || cleanPath === '/app.js'
     || cleanPath === '/styles.css'
     || cleanPath === '/favicon.ico'
+    || cleanPath.startsWith('/stage/')
     || cleanPath.startsWith('/panitia/')
     || cleanPath.startsWith('/speaker/')
     || cleanPath.startsWith('/api/rooms/')
@@ -95,6 +96,12 @@ function publicPathAllowed(pathname) {
 function normalizeRole(role) {
   const cleanRole = String(role || '').toLowerCase();
   if (cleanRole === 'operator') return 'operator';
+  if (cleanRole === 'stage') return 'stage';
+  return 'panitia';
+}
+
+function normalizePublicRole(role) {
+  const cleanRole = String(role || '').toLowerCase();
   if (cleanRole === 'stage') return 'stage';
   return 'panitia';
 }
@@ -480,7 +487,7 @@ io.on('connection', (socket) => {
 
   socket.on('room:join', ({ roomId, role }) => {
     joinedRoom = String(roomId || 'main').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 48) || 'main';
-    joinedRole = publicClient ? 'panitia' : normalizeRole(role);
+    joinedRole = publicClient ? normalizePublicRole(role) : normalizeRole(role);
     socket.join(joinedRoom);
     socket.emit('room:state', hydrateForClient(getRoom(joinedRoom)));
   });

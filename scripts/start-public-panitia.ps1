@@ -15,6 +15,7 @@ $TunnelErr = Join-Path $Artifacts 'cloudflared.err.log'
 $TunnelPid = Join-Path $Artifacts 'cloudflared.pid'
 $PublicUrlFile = Join-Path $Artifacts 'public-url.txt'
 $PublicPanitiaUrlFile = Join-Path $Artifacts 'public-panitia-url.txt'
+$PublicStageUrlFile = Join-Path $Artifacts 'public-stage-url.txt'
 
 New-Item -ItemType Directory -Force -Path $Artifacts | Out-Null
 
@@ -102,6 +103,7 @@ function Wait-TunnelUrl {
     if ($url) {
       $url | Set-Content -NoNewline -Path $PublicUrlFile
       "$url/panitia/main" | Set-Content -NoNewline -Path $PublicPanitiaUrlFile
+      "$url/stage/main" | Set-Content -NoNewline -Path $PublicStageUrlFile
       return $url
     }
     Start-Sleep -Seconds 1
@@ -139,7 +141,7 @@ if (Test-Path $TunnelPid) {
 }
 
 if (-not $existingTunnel) {
-  Remove-Item -Force $TunnelLog, $TunnelErr, $PublicUrlFile, $PublicPanitiaUrlFile -ErrorAction SilentlyContinue
+  Remove-Item -Force $TunnelLog, $TunnelErr, $PublicUrlFile, $PublicPanitiaUrlFile, $PublicStageUrlFile -ErrorAction SilentlyContinue
   $tunnel = Start-Process -FilePath 'cloudflared' `
     -ArgumentList @('tunnel', '--url', 'http://127.0.0.1:3000') `
     -WorkingDirectory $Root `
@@ -152,3 +154,4 @@ if (-not $existingTunnel) {
 
 $url = Wait-TunnelUrl
 Write-Output "ShowTimer public Panitia URL: $url/panitia/main"
+Write-Output "ShowTimer public Stage URL: $url/stage/main"

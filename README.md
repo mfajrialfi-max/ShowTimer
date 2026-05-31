@@ -19,21 +19,22 @@ Buka:
 
 Untuk perangkat lain di jaringan yang sama, pakai alamat LAN yang muncul di terminal saat server berjalan, misalnya `http://192.168.1.20:3000/stage/main`.
 
-## Link publik sementara untuk panitia
+## Link publik sementara untuk panitia dan stage
 
-Untuk membuka layar panitia lewat internet tanpa deploy penuh, jalankan ShowTimer lalu buka terminal kedua:
+Untuk membuka layar panitia atau stage lewat internet tanpa deploy penuh, jalankan ShowTimer lalu buka terminal kedua:
 
 ```bash
 cloudflared tunnel --url http://localhost:3000
 ```
 
-Cloudflare akan memberi URL `https://...trycloudflare.com`. Bagikan link `/panitia/main`, misalnya:
+Cloudflare akan memberi URL `https://...trycloudflare.com`. Bagikan link `/panitia/main` atau `/stage/main`, misalnya:
 
 ```text
 https://...trycloudflare.com/panitia/main
+https://...trycloudflare.com/stage/main
 ```
 
-Saat dibuka dari host publik, ShowTimer mengarahkan halaman operator/stage ke halaman panitia dan hanya menerima pesan dari panitia. Kontrol operator tetap gunakan `localhost` atau alamat LAN.
+Saat dibuka dari host publik, ShowTimer mengizinkan halaman panitia dan stage. Halaman stage bersifat read-only dan menerima update dari operator. Halaman operator publik tetap diarahkan ke halaman panitia. Kontrol operator tetap gunakan `localhost` atau alamat LAN.
 
 ## Auto-start saat laptop menyala
 
@@ -47,6 +48,7 @@ Ini membuat Windows Task Scheduler bernama `ShowTimer Public Tunnel` yang otomat
 
 ```text
 artifacts\public-panitia-url.txt
+artifacts\public-stage-url.txt
 ```
 
 Untuk menampilkan link dari terminal:
