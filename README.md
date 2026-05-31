@@ -19,6 +19,38 @@ Buka:
 
 Untuk perangkat lain di jaringan yang sama, pakai alamat LAN yang muncul di terminal saat server berjalan, misalnya `http://192.168.1.20:3000/stage/main`.
 
+## Cara cepat via CMD
+
+Masuk ke folder proyek:
+
+```cmd
+cd /d D:\ShowTimer
+```
+
+Mulai ulang server dan buat link publik baru:
+
+```cmd
+start-public-links.bat
+```
+
+Lihat link publik yang sedang aktif:
+
+```cmd
+show-links.bat
+```
+
+Cek apakah link lokal dan publik merespons:
+
+```cmd
+check-public-links.bat
+```
+
+Refresh server tanpa mengganti link publik:
+
+```cmd
+refresh-keep-link.bat
+```
+
 ## Link publik sementara untuk panitia dan stage
 
 Untuk membuka layar panitia atau stage lewat internet tanpa deploy penuh, jalankan ShowTimer lalu buka terminal kedua:
