@@ -55,6 +55,14 @@ Untuk menampilkan link dari terminal:
 powershell -ExecutionPolicy Bypass -File scripts\show-public-link.ps1
 ```
 
+Untuk refresh server tanpa mengganti link publik yang sedang aktif:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\refresh-server-keep-link.ps1
+```
+
+Atau double-click `refresh-keep-link.bat`. Jangan pakai opsi `-Restart` kalau ingin URL tetap sama.
+
 Catatan: Quick Tunnel Cloudflare bisa mengganti URL setiap kali tunnel dibuat ulang. Untuk URL permanen, gunakan Cloudflare Tunnel bernama dengan domain sendiri atau deploy ke host Node.
 
 ## Fitur

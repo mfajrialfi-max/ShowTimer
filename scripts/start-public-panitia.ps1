@@ -85,9 +85,11 @@ function Get-TunnelUrlFromLogs {
     $logText += Get-Content -Raw $TunnelErr
   }
 
-  $match = [regex]::Match($logText, 'https://[a-zA-Z0-9-]+\.trycloudflare\.com')
-  if ($match.Success) {
-    return $match.Value
+  $matches = [regex]::Matches($logText, 'https://[a-zA-Z0-9-]+\.trycloudflare\.com')
+  foreach ($match in $matches) {
+    if ($match.Value -ne 'https://api.trycloudflare.com') {
+      return $match.Value
+    }
   }
 
   return $null
